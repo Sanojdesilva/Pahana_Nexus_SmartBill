@@ -79,9 +79,24 @@
                         <div class="form-group">
                             <label for="category">Category</label>
                             <select id="category" name="category">
-                                <option value="ELECTRICITY" ${item.category == 'ELECTRICITY' ? 'selected' : ''}>Electricity</option>
-                                <option value="WATER" ${item.category == 'WATER' ? 'selected' : ''}>Water</option>
-                                <option value="GAS" ${item.category == 'GAS' ? 'selected' : ''}>Gas</option>
+                                <option value="FICTION" ${item.category == 'FICTION' ? 'selected' : ''}>Fiction</option>
+                                <option value="NONFICTION" ${item.category == 'NONFICTION' ? 'selected' : ''}>Non-Fiction</option>
+                                <option value="CHILDREN" ${item.category == 'CHILDREN' ? 'selected' : ''}>Children’s Books</option>
+                                <option value="EDUCATIONAL" ${item.category == 'EDUCATIONAL' ? 'selected' : ''}>Educational</option>
+                                <option value="STATIONERY" ${item.category == 'STATIONERY' ? 'selected' : ''}>Stationery</option>
+                                <option value="MAGAZINES" ${item.category == 'MAGAZINES' ? 'selected' : ''}>Magazines</option>
+                                <option value="COMICS" ${item.category == 'COMICS' ? 'selected' : ''}>Comics & Graphic Novels</option>
+                                <option value="REFERENCE" ${item.category == 'REFERENCE' ? 'selected' : ''}>Reference</option>
+                                <option value="ART" ${item.category == 'ART' ? 'selected' : ''}>Art & Photography</option>
+                                <option value="SCIENCE" ${item.category == 'SCIENCE' ? 'selected' : ''}>Science & Technology</option>
+                                <option value="RELIGION" ${item.category == 'RELIGION' ? 'selected' : ''}>Religion & Spirituality</option>
+                                <option value="BIOGRAPHY" ${item.category == 'BIOGRAPHY' ? 'selected' : ''}>Biographies</option>
+                                <option value="HISTORY" ${item.category == 'HISTORY' ? 'selected' : ''}>History</option>
+                                <option value="MYSTERY" ${item.category == 'MYSTERY' ? 'selected' : ''}>Mystery & Thriller</option>
+                                <option value="ROMANCE" ${item.category == 'ROMANCE' ? 'selected' : ''}>Romance</option>
+                                <option value="FANTASY" ${item.category == 'FANTASY' ? 'selected' : ''}>Fantasy & Sci-Fi</option>
+                                <option value="SELFHELP" ${item.category == 'SELFHELP' ? 'selected' : ''}>Self-Help</option>
+                                <option value="BUSINESS" ${item.category == 'BUSINESS' ? 'selected' : ''}>Business & Economics</option>
                                 <option value="OTHER" ${item.category == 'OTHER' ? 'selected' : ''}>Other</option>
                             </select>
                         </div>

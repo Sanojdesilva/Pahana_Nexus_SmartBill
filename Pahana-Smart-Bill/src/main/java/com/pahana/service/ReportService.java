@@ -291,60 +291,85 @@ public class ReportService {
         Document document = new Document(PageSize.A4);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PdfWriter.getInstance(document, baos);
-        
+
         document.open();
-        
+
         // Header
         Paragraph title = new Paragraph("PAHANA SMART BILL", TITLE_FONT);
         title.setAlignment(Element.ALIGN_CENTER);
         document.add(title);
         document.add(new Paragraph(" "));
-        
+
         // Bill Information
         PdfPTable billInfo = new PdfPTable(2);
         billInfo.setWidthPercentage(100);
-        
+
         addSummaryRow(billInfo, "Bill Number:", bill.getBillNumber());
         addSummaryRow(billInfo, "Bill Date:", bill.getCreatedAt().toString());
         addSummaryRow(billInfo, "Status:", bill.getStatus());
-        
+
         document.add(billInfo);
         document.add(new Paragraph(" "));
-        
+
         // Customer Information
         Paragraph customerTitle = new Paragraph("Customer Information", HEADER_FONT);
         document.add(customerTitle);
         document.add(new Paragraph(" "));
-        
+
         PdfPTable customerInfo = new PdfPTable(2);
         customerInfo.setWidthPercentage(100);
-        
+
         addSummaryRow(customerInfo, "Name:", customer.getName());
         addSummaryRow(customerInfo, "Account Number:", customer.getAccountNumber());
         addSummaryRow(customerInfo, "Email:", customer.getEmail());
         addSummaryRow(customerInfo, "Phone:", customer.getPhone());
         addSummaryRow(customerInfo, "Address:", customer.getAddress());
-        
+
         document.add(customerInfo);
         document.add(new Paragraph(" "));
-        
+
         // Bill Details
         Paragraph detailsTitle = new Paragraph("Bill Details", HEADER_FONT);
         document.add(detailsTitle);
         document.add(new Paragraph(" "));
-        
+
         PdfPTable billDetails = new PdfPTable(2);
         billDetails.setWidthPercentage(100);
-        
+
         addSummaryRow(billDetails, "Units Consumed:", String.valueOf(bill.getUnitsConsumed()));
         addSummaryRow(billDetails, "Unit Rate:", "$" + String.format("%.2f", bill.getUnitRate()));
         addSummaryRow(billDetails, "Subtotal:", "$" + String.format("%.2f", bill.getSubtotal()));
         addSummaryRow(billDetails, "Tax Amount:", "$" + String.format("%.2f", bill.getTaxAmount()));
         addSummaryRow(billDetails, "Total Amount:", "$" + String.format("%.2f", bill.getTotal()));
-        
+
         document.add(billDetails);
         document.add(new Paragraph(" "));
-        
+
+        // --- Purchased Items Table ---
+        com.pahana.dao.BillItemDAO billItemDAO = new com.pahana.dao.BillItemDAO();
+        java.util.List<com.pahana.model.BillItem> billItems = billItemDAO.getBillItemsWithDetails(bill.getId());
+        if (billItems != null && !billItems.isEmpty()) {
+            Paragraph itemsTitle = new Paragraph("Purchased Items", HEADER_FONT);
+            document.add(itemsTitle);
+            document.add(new Paragraph(" "));
+
+            PdfPTable itemsTable = new PdfPTable(4);
+            itemsTable.setWidthPercentage(100);
+            itemsTable.addCell(new PdfPCell(new Phrase("Item Name", HEADER_FONT)));
+            itemsTable.addCell(new PdfPCell(new Phrase("Quantity", HEADER_FONT)));
+            itemsTable.addCell(new PdfPCell(new Phrase("Unit Price", HEADER_FONT)));
+            itemsTable.addCell(new PdfPCell(new Phrase("Total", HEADER_FONT)));
+
+            for (com.pahana.model.BillItem item : billItems) {
+                itemsTable.addCell(new PdfPCell(new Phrase(item.getItemName(), NORMAL_FONT)));
+                itemsTable.addCell(new PdfPCell(new Phrase(String.valueOf(item.getQuantity()), NORMAL_FONT)));
+                itemsTable.addCell(new PdfPCell(new Phrase("$" + String.format("%.2f", item.getUnitPrice()), NORMAL_FONT)));
+                itemsTable.addCell(new PdfPCell(new Phrase("$" + String.format("%.2f", item.getTotalPrice()), NORMAL_FONT)));
+            }
+            document.add(itemsTable);
+            document.add(new Paragraph(" "));
+        }
+
         // Notes
         if (bill.getNotes() != null && !bill.getNotes().isEmpty()) {
             Paragraph notesTitle = new Paragraph("Notes:", HEADER_FONT);
@@ -352,12 +377,12 @@ public class ReportService {
             document.add(new Paragraph(bill.getNotes(), NORMAL_FONT));
             document.add(new Paragraph(" "));
         }
-        
+
         // Footer
         Paragraph footer = new Paragraph("Thank you for your business!", NORMAL_FONT);
         footer.setAlignment(Element.ALIGN_CENTER);
         document.add(footer);
-        
+
         document.close();
         return baos.toByteArray();
     }
