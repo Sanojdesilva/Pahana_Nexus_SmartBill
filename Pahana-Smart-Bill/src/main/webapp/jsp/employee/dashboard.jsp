@@ -7,179 +7,138 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Dashboard - Pahana Smart Bill</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/global-theme.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
-            color: #333;
+            min-height: 100vh;
         }
         
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            color: var(--text-white);
+            padding: var(--spacing-md) var(--spacing-lg);
+            box-shadow: var(--shadow-lg);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
         }
         
         .header h1 {
-            font-size: 1.5rem;
+            color: var(--text-white);
+            margin-bottom: 0;
+            font-size: 1.8rem;
         }
         
         .user-info {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: var(--spacing-md);
+        }
+        
+        .user-info span {
+            font-weight: 500;
         }
         
         .logout-btn {
             background: rgba(255, 255, 255, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
+            color: var(--text-white);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-sm);
             text-decoration: none;
-            transition: background 0.3s;
+            transition: background var(--transition-normal);
+            font-weight: 500;
         }
         
         .logout-btn:hover {
             background: rgba(255, 255, 255, 0.3);
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        
-        .stat-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        
-        .stat-card h3 {
-            color: #667eea;
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .stat-card p {
-            color: #666;
-            font-size: 0.9rem;
+            text-decoration: none;
+            color: var(--text-white);
         }
         
         .content-grid {
             display: grid;
             grid-template-columns: 2fr 1fr;
-            gap: 2rem;
+            gap: var(--spacing-xl);
         }
         
         .recent-section {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--bg-overlay);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .recent-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
         }
         
         .recent-section h2 {
-            color: #333;
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
+            color: var(--text-dark);
+            margin-bottom: var(--spacing-lg);
+            font-size: 1.5rem;
+            font-weight: 700;
         }
         
         .recent-item {
-            padding: 0.75rem 0;
-            border-bottom: 1px solid #eee;
+            padding: var(--spacing-md) 0;
+            border-bottom: 1px solid var(--bg-overlay);
+            transition: all var(--transition-normal);
         }
         
         .recent-item:last-child {
             border-bottom: none;
         }
         
+        .recent-item:hover {
+            background: rgba(44, 85, 48, 0.02);
+            margin: 0 calc(-1 * var(--spacing-md));
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+        }
+        
         .recent-item h4 {
-            color: #333;
-            margin-bottom: 0.25rem;
+            color: var(--text-dark);
+            margin-bottom: var(--spacing-xs);
+            font-weight: 600;
         }
         
         .recent-item p {
-            color: #666;
+            color: var(--text-light);
             font-size: 0.9rem;
-        }
-        
-        .nav-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-        
-        .nav-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            text-decoration: none;
-            color: #333;
-            transition: transform 0.2s;
-        }
-        
-        .nav-card:hover {
-            transform: translateY(-2px);
-        }
-        
-        .nav-card h3 {
-            color: #667eea;
-            margin-bottom: 0.5rem;
-        }
-        
-        .nav-card p {
-            color: #666;
-            font-size: 0.9rem;
-        }
-        
-        .error {
-            background: #fee;
-            color: #c33;
-            padding: 1rem;
-            border-radius: 5px;
-            margin-bottom: 1rem;
-            border: 1px solid #fcc;
-        }
-        
-        .success {
-            background: #efe;
-            color: #3c3;
-            padding: 1rem;
-            border-radius: 5px;
-            margin-bottom: 1rem;
-            border: 1px solid #cfc;
+            margin-bottom: 0;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Employee Dashboard</h1>
-        <div class="user-info">
-            <span>Welcome, ${sessionScope.username}</span>
-            <a href="${pageContext.request.contextPath}/logout" class="logout-btn">Logout</a>
+        <div class="header-content">
+            <h1><i class="fas fa-user-tie"></i> Employee Dashboard</h1>
+            <div class="user-info">
+                <span><i class="fas fa-user"></i> Welcome, ${sessionScope.username}</span>
+                <a href="${pageContext.request.contextPath}/logout" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
         </div>
     </div>
     

@@ -5,63 +5,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Pahana Smart Bill</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/global-theme.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        :root {
-            --primary-color: #2c5530;
-            --secondary-color: #4a7c59;
-            --accent-color: #8b4513;
-            --text-dark: #1a1a1a;
-            --text-light: #6b7280;
-            --bg-light: #f8fafc;
-            --bg-white: #ffffff;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-        
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
+            padding: var(--spacing-lg) 0;
             min-height: 100vh;
-            padding: 2rem 0;
-            position: relative;
-            overflow-x: hidden;
-            color: var(--text-dark);
-        }
-        
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(44, 85, 48, 0.03) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(74, 124, 89, 0.03) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(139, 69, 19, 0.02) 0%, transparent 50%);
-            z-index: -1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .register-container {
-            background: rgba(255, 255, 255, 0.95);
+            background: var(--bg-card);
             backdrop-filter: blur(20px);
-            padding: 3.5rem;
-            border-radius: 24px;
+            padding: var(--spacing-2xl);
+            border-radius: var(--radius-2xl);
             box-shadow: var(--shadow-xl);
             width: 100%;
             max-width: 800px;
             margin: 0 auto;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid var(--bg-overlay);
             position: relative;
             overflow: hidden;
         }
@@ -73,12 +36,12 @@
             left: 0;
             right: 0;
             height: 4px;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-light), var(--secondary-color));
         }
         
         .logo {
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: var(--spacing-xl);
         }
         
         .logo-badge {
@@ -87,9 +50,9 @@
             justify-content: center;
             width: 70px;
             height: 70px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
             border-radius: 50%;
-            margin-bottom: 1.5rem;
+            margin-bottom: var(--spacing-lg);
             box-shadow: var(--shadow-lg);
             position: relative;
             animation: pulse 2s infinite;
@@ -97,7 +60,7 @@
         
         .logo-badge i {
             font-size: 2rem;
-            color: white;
+            color: var(--text-white);
         }
         
         @keyframes pulse {
@@ -106,12 +69,11 @@
         }
         
         .logo h1 {
-            font-family: 'Playfair Display', serif;
             color: var(--text-dark);
             font-size: 2.8rem;
-            margin-bottom: 0.5rem;
+            margin-bottom: var(--spacing-xs);
             font-weight: 900;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -127,8 +89,8 @@
         
         .form-row {
             display: flex;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
         }
         
         .form-group {
@@ -138,7 +100,7 @@
         
         .form-group label {
             display: block;
-            margin-bottom: 0.8rem;
+            margin-bottom: var(--spacing-xs);
             color: var(--text-dark);
             font-weight: 600;
             font-size: 0.95rem;
@@ -151,21 +113,22 @@
         
         .input-wrapper i {
             position: absolute;
-            left: 1rem;
+            left: var(--spacing-sm);
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-light);
+            color: var(--text-muted);
             font-size: 1.1rem;
-            transition: color 0.3s ease;
+            transition: color var(--transition-normal);
+            z-index: 2;
         }
         
         .form-group input, .form-group select {
             width: 100%;
-            padding: 1rem 1rem 1rem 3rem;
+            padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-sm) 3rem;
             border: 2px solid #e5e7eb;
-            border-radius: 12px;
+            border-radius: var(--radius-md);
             font-size: 1rem;
-            transition: all 0.3s ease;
+            transition: all var(--transition-normal);
             background: rgba(255, 255, 255, 0.9);
             font-family: 'Inter', sans-serif;
             color: var(--text-dark);
@@ -175,7 +138,7 @@
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(44, 85, 48, 0.1);
-            background: white;
+            background: var(--bg-white);
         }
         
         .form-group input:focus + i,
@@ -184,20 +147,20 @@
         }
         
         .form-group input::placeholder {
-            color: #9ca3af;
+            color: var(--text-muted);
         }
         
         .btn {
             width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
+            padding: var(--spacing-sm);
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: var(--text-white);
             border: none;
-            border-radius: 12px;
+            border-radius: var(--radius-md);
             font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all var(--transition-normal);
             font-family: 'Inter', sans-serif;
             letter-spacing: 0.5px;
             position: relative;
@@ -205,7 +168,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            gap: var(--spacing-xs);
         }
         
         .btn::before {
@@ -216,14 +179,14 @@
             width: 100%;
             height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
+            transition: left var(--transition-slow);
         }
         
         .btn:hover::before {
             left: 100%;
         }
         
-        .btn:hover {
+                .btn:hover {
             transform: translateY(-2px);
             box-shadow: var(--shadow-lg);
         }

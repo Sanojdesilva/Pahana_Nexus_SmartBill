@@ -304,12 +304,13 @@
                 <h4>Automatic Item Code Generation</h4>
                 <p>Item codes are automatically generated based on category:</p>
                 <ul>
-                    <li><strong>Electricity:</strong> ELEC + timestamp + random</li>
-                    <li><strong>Water:</strong> WATER + timestamp + random</li>
-                    <li><strong>Gas:</strong> GAS + timestamp + random</li>
-                    <li><strong>Internet:</strong> NET + timestamp + random</li>
-                    <li><strong>Telephone:</strong> TEL + timestamp + random</li>
-                    <li><strong>Other:</strong> ITEM + timestamp + random</li>
+                    <li><strong>Fiction:</strong> FIC + timestamp + random</li>
+                    <li><strong>Non-Fiction:</strong> NF + timestamp + random</li>
+                    <li><strong>Children’s Books:</strong> CHD + timestamp + random</li>
+                    <li><strong>Educational:</strong> EDU + timestamp + random</li>
+                    <li><strong>Stationery:</strong> STN + timestamp + random</li>
+                    <li><strong>Science & Technology:</strong> SCI + timestamp + random</li>
+                    <li><strong>Religion & Spirituality:</strong> REL + timestamp + random</li>
                 </ul>
             </div>
             

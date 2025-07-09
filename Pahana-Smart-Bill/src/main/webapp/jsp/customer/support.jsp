@@ -9,112 +9,150 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/global-theme.css">
     <script src="${pageContext.request.contextPath}/js/theme-manager.js"></script>
     <style>
+        body { min-height: 100vh; }
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            color: var(--text-white);
+            padding: var(--spacing-md) var(--spacing-lg);
+            box-shadow: var(--shadow-lg);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header h1 {
+            color: var(--text-white);
+            margin-bottom: 0;
+            font-size: 1.8rem;
+        }
+        .nav-links {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+        .nav-links a {
+            color: var(--text-white);
+            text-decoration: none;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-sm);
+            transition: background var(--transition-normal);
+            font-weight: 500;
+        }
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+            color: var(--text-white);
+        }
+        .card { background: var(--bg-card); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); border: 1px solid var(--bg-overlay); margin-bottom: var(--spacing-xl); padding: var(--spacing-xl); }
+        .table-header { background: rgba(44, 85, 48, 0.05); padding: var(--spacing-lg); border-bottom: 1px solid var(--bg-overlay); border-radius: var(--radius-xl) var(--radius-xl) 0 0; }
+        .table-header h2, .table-header h3 { margin: 0; color: var(--text-dark); font-weight: 700; }
         .support-container { max-width: 1000px; margin: 0 auto; }
-        .support-header { text-align: center; margin-bottom: 2rem; }
-        .support-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
-        .support-section { background: var(--card-bg); padding: 1.5rem; border-radius: 10px; box-shadow: var(--shadow); }
-        .support-section h3 { color: var(--primary-color); margin-bottom: 1rem; border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem; }
-        
-        .form-group { margin-bottom: 1rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; color: var(--text-color); }
-        .form-control { width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 5px; background: var(--input-bg); color: var(--text-color); }
-        .form-control:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2); }
+        .support-header { text-align: center; margin-bottom: var(--spacing-xl); }
+        .support-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-xl); margin-bottom: var(--spacing-xl); }
+        .support-section { background: var(--bg-white); padding: var(--spacing-xl); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
+        .form-group { margin-bottom: var(--spacing-md); }
+        .form-group label { display: block; margin-bottom: var(--spacing-xs); font-weight: 600; color: var(--text-dark); }
+        .form-control { width: 100%; padding: var(--spacing-sm); border: 2px solid #e5e7eb; border-radius: var(--radius-md); font-size: 1rem; background: rgba(255,255,255,0.9); color: var(--text-dark); transition: all var(--transition-normal); }
+        .form-control:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(44, 85, 48, 0.1); background: var(--bg-white); }
         textarea.form-control { min-height: 120px; resize: vertical; }
-        
-        .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
+        .btn { padding: var(--spacing-sm) var(--spacing-lg); border: none; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; transition: all var(--transition-normal); display: inline-flex; align-items: center; gap: var(--spacing-xs); font-size: 1rem; }
         .btn-primary { background: var(--primary-color); color: white; }
         .btn-secondary { background: var(--secondary-color); color: white; }
         .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-        
-        .contact-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-        .contact-card { background: var(--card-bg); padding: 1.5rem; border-radius: 10px; box-shadow: var(--shadow); text-align: center; }
+        .contact-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+        .contact-card { background: var(--bg-white); padding: var(--spacing-xl); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); text-align: center; }
         .contact-card .icon { font-size: 2rem; margin-bottom: 1rem; }
         .contact-card h4 { color: var(--primary-color); margin-bottom: 0.5rem; }
         .contact-card p { color: var(--text-muted); margin: 0; }
-        
-        .faq-item { border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 1rem; overflow: hidden; }
-        .faq-question { background: var(--table-alt-bg); padding: 1rem; cursor: pointer; font-weight: bold; color: var(--text-color); display: flex; justify-content: space-between; align-items: center; }
-        .faq-question:hover { background: var(--table-hover-bg); }
-        .faq-answer { padding: 1rem; color: var(--text-muted); border-top: 1px solid var(--border-color); display: none; }
+        .faq-item { border: 1px solid var(--bg-overlay); border-radius: var(--radius-md); margin-bottom: var(--spacing-md); overflow: hidden; }
+        .faq-question { background: var(--bg-secondary); padding: var(--spacing-md); cursor: pointer; font-weight: bold; color: var(--text-dark); display: flex; justify-content: space-between; align-items: center; }
+        .faq-question:hover { background: var(--bg-card); }
+        .faq-answer { padding: var(--spacing-md); color: var(--text-muted); border-top: 1px solid var(--bg-overlay); display: none; }
         .faq-answer.active { display: block; }
         .faq-toggle { font-size: 1.2rem; transition: transform 0.3s; }
         .faq-toggle.active { transform: rotate(180deg); }
-        
-        .priority-select { padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 5px; background: var(--input-bg); color: var(--text-color); }
+        .priority-select { padding: var(--spacing-sm); border: 2px solid #e5e7eb; border-radius: var(--radius-md); background: rgba(255,255,255,0.9); color: var(--text-dark); }
         .priority-high { color: #dc3545; }
         .priority-medium { color: #ffc107; }
         .priority-low { color: #28a745; }
-        
-        .coming-soon { text-align: center; padding: 3rem; color: var(--text-muted); }
-        .coming-soon h3 { margin-bottom: 1rem; color: var(--text-color); }
+        .coming-soon { text-align: center; padding: var(--spacing-xl); color: var(--text-muted); background: var(--bg-white); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); margin-bottom: var(--spacing-xl); }
+        .coming-soon h3 { margin-bottom: 1rem; color: var(--text-dark); }
         .coming-soon .icon { font-size: 4rem; margin-bottom: 1rem; opacity: 0.5; }
-        
         .status-badge { padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
         .status-open { background: #d4edda; color: #155724; }
         .status-pending { background: #fff3cd; color: #856404; }
         .status-resolved { background: #cce5ff; color: #004085; }
+        @media (max-width: 900px) { .support-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .nav-links { flex-direction: column; gap: 0.5rem; } .support-header { margin-bottom: var(--spacing-lg); } }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Customer Support</h1>
-        <div class="nav-links">
-            <a href="${pageContext.request.contextPath}/customer/dashboard">Dashboard</a>
-            <a href="${pageContext.request.contextPath}/customer/bills">My Bills</a>
-            <a href="${pageContext.request.contextPath}/customer/profile">My Profile</a>
-            <a href="${pageContext.request.contextPath}/logout">Logout</a>
+        <div class="header-content">
+            <h1><i class="fas fa-headset"></i> Customer Support</h1>
+            <div class="nav-links">
+                <a href="${pageContext.request.contextPath}/customer/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a href="${pageContext.request.contextPath}/customer/bills"><i class="fas fa-file-invoice"></i> My Bills</a>
+                <a href="${pageContext.request.contextPath}/customer/profile"><i class="fas fa-user"></i> My Profile</a>
+                <a href="${pageContext.request.contextPath}/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
         </div>
     </div>
-    
     <div class="container">
         <div class="support-container">
-            <div class="support-header">
-                <h2>How Can We Help You?</h2>
-                <p>Get assistance with your billing, payments, and account questions</p>
+            <div class="card">
+                <div class="table-header"><h2>How Can We Help You?</h2></div>
+                <div class="support-header">
+                    <p>Get assistance with your billing, payments, and account questions</p>
+                </div>
+                <div class="contact-info">
+                    <div class="contact-card">
+                        <div class="icon">📞</div>
+                        <h4>Phone Support</h4>
+                        <p>+1 (555) 123-4567</p>
+                        <p>Mon-Fri: 9AM-6PM</p>
+                    </div>
+                    <div class="contact-card">
+                        <div class="icon">✉️</div>
+                        <h4>Email Support</h4>
+                        <p>support@pahana.com</p>
+                        <p>Response within 24h</p>
+                    </div>
+                    <div class="contact-card">
+                        <div class="icon">💬</div>
+                        <h4>Live Chat</h4>
+                        <p>Available 24/7</p>
+                        <p>Click to start chat</p>
+                    </div>
+                    <div class="contact-card">
+                        <div class="icon">🏢</div>
+                        <h4>Office Visit</h4>
+                        <p>123 Main Street</p>
+                        <p>City, State 12345</p>
+                    </div>
+                </div>
             </div>
-            
-            <!-- Contact Information -->
-            <div class="contact-info">
-                <div class="contact-card">
-                    <div class="icon">📞</div>
-                    <h4>Phone Support</h4>
-                    <p>+1 (555) 123-4567</p>
-                    <p>Mon-Fri: 9AM-6PM</p>
-                </div>
-                <div class="contact-card">
-                    <div class="icon">✉️</div>
-                    <h4>Email Support</h4>
-                    <p>support@pahana.com</p>
-                    <p>Response within 24h</p>
-                </div>
-                <div class="contact-card">
-                    <div class="icon">💬</div>
-                    <h4>Live Chat</h4>
-                    <p>Available 24/7</p>
-                    <p>Click to start chat</p>
-                </div>
-                <div class="contact-card">
-                    <div class="icon">🏢</div>
-                    <h4>Office Visit</h4>
-                    <p>123 Main Street</p>
-                    <p>City, State 12345</p>
+            <div class="card">
+                <div class="table-header"><h2>Support Portal</h2></div>
+                <div class="coming-soon">
+                    <div class="icon">🛠️</div>
+                    <h3>Support Portal Coming Soon</h3>
+                    <p>We are working on a comprehensive support portal that will allow you to submit tickets, track your requests, and get real-time updates. This feature will be available soon.</p>
+                    <p>In the meantime, please use the contact methods above for immediate assistance.</p>
+                    <button class="btn btn-primary" onclick="showContactForm()"><i class="fas fa-envelope"></i> Contact Support</button>
                 </div>
             </div>
-            
-            <!-- Coming Soon Message -->
-            <div class="coming-soon">
-                <div class="icon">🛠️</div>
-                <h3>Support Portal Coming Soon</h3>
-                <p>We are working on a comprehensive support portal that will allow you to submit tickets, track your requests, and get real-time updates. This feature will be available soon.</p>
-                <p>In the meantime, please use the contact methods above for immediate assistance.</p>
-                <button class="btn btn-primary" onclick="showContactForm()">Contact Support</button>
-            </div>
-            
             <!-- Support Form (Hidden for now) -->
             <div id="supportForm" style="display: none;">
                 <div class="support-grid">
                     <div class="support-section">
-                        <h3>Submit a Support Ticket</h3>
+                        <div class="table-header"><h3>Submit a Support Ticket</h3></div>
                         <form id="ticketForm">
                             <div class="form-group">
                                 <label for="subject">Subject</label>
@@ -147,12 +185,11 @@
                                 <label for="email">Contact Email</label>
                                 <input type="email" id="email" name="email" class="form-control" placeholder="your@email.com" required />
                             </div>
-                            <button type="submit" class="btn btn-primary">Submit Ticket</button>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Submit Ticket</button>
                         </form>
                     </div>
-                    
                     <div class="support-section">
-                        <h3>Frequently Asked Questions</h3>
+                        <div class="table-header"><h3>Frequently Asked Questions</h3></div>
                         <div class="faq-item">
                             <div class="faq-question" onclick="toggleFAQ(this)">
                                 How do I download my bill?
@@ -200,71 +237,25 @@
                         </div>
                     </div>
                 </div>
-                
-                <!-- Ticket History (Hidden for now) -->
-                <div class="support-section" style="display: none;">
-                    <h3>My Support Tickets</h3>
-                    <table class="bills-table">
-                        <thead>
-                            <tr>
-                                <th>Ticket #</th>
-                                <th>Subject</th>
-                                <th>Category</th>
-                                <th>Status</th>
-                                <th>Created</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>#TKT-001</td>
-                                <td>Payment Issue</td>
-                                <td>Payment</td>
-                                <td><span class="status-badge status-open">Open</span></td>
-                                <td>Jan 15, 2024</td>
-                                <td><button class="btn btn-secondary">View</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
             </div>
         </div>
     </div>
-    
+    <script src="https://kit.fontawesome.com/4b7c1b6e8b.js" crossorigin="anonymous"></script>
     <script>
         function showContactForm() {
             document.getElementById('supportForm').style.display = 'block';
-            document.querySelector('.coming-soon').style.display = 'none';
+            window.scrollTo({top: document.getElementById('supportForm').offsetTop-40, behavior: 'smooth'});
         }
-        
-        function toggleFAQ(element) {
-            const answer = element.nextElementSibling;
-            const toggle = element.querySelector('.faq-toggle');
-            
-            if (answer.classList.contains('active')) {
-                answer.classList.remove('active');
-                toggle.classList.remove('active');
-            } else {
-                // Close all other FAQs
-                document.querySelectorAll('.faq-answer').forEach(ans => ans.classList.remove('active'));
-                document.querySelectorAll('.faq-toggle').forEach(tog => tog.classList.remove('active'));
-                
-                // Open this FAQ
-                answer.classList.add('active');
-                toggle.classList.add('active');
-            }
+        function toggleFAQ(el) {
+            const answer = el.nextElementSibling;
+            const toggle = el.querySelector('.faq-toggle');
+            answer.classList.toggle('active');
+            toggle.classList.toggle('active');
         }
-        
-        // Form submission
-        document.getElementById('ticketForm').addEventListener('submit', function(e) {
+        document.getElementById('ticketForm')?.addEventListener('submit', function(e) {
             e.preventDefault();
-            alert('Support ticket submitted successfully! We will get back to you soon.');
+            alert('Your support ticket has been submitted! Our team will get back to you soon.');
             this.reset();
-        });
-        
-        // Priority color coding
-        document.getElementById('priority').addEventListener('change', function() {
-            this.className = 'form-control priority-' + this.value;
         });
     </script>
 </body>

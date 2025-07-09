@@ -8,63 +8,198 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Management - Pahana Smart Bill</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/global-theme.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; color: #333; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .header h1 { font-size: 1.5rem; }
-        .nav-links { display: flex; gap: 1rem; }
-        .nav-links a { color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 5px; transition: background 0.3s; }
-        .nav-links a:hover { background: rgba(255,255,255,0.2); }
-        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-        .page-header h2 { color: #333; font-size: 1.8rem; }
-        .btn { background: #667eea; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 5px; text-decoration: none; display: inline-block; cursor: pointer; transition: background 0.3s; font-size: 1rem; }
-        .btn:hover { background: #5a6fd8; }
-        .btn-secondary { background: #6c757d; }
-        .btn-secondary:hover { background: #5a6268; }
-        .btn-danger { background: #dc3545; }
-        .btn-danger:hover { background: #c82333; }
-        .btn-warning { background: #ffc107; color: #333; }
-        .btn-warning:hover { background: #e0a800; }
-        .btn-float { position: fixed; bottom: 2rem; right: 2rem; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        .search-bar { background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem; }
-        .search-form { display: flex; gap: 1rem; align-items: center; }
-        .form-group { flex: 1; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
-        .form-group input, .form-group select { width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem; }
-        .users-table { background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow-x: auto; width: 100%; }
-        .table-header { background: #f8f9fa; padding: 1rem; border-bottom: 1px solid #dee2e6; }
-        .table-header h2 { margin: 0; color: #333; }
-        table { width: 100%; min-width: 1100px; border-collapse: collapse; }
-        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #dee2e6; }
-        th { background: #f8f9fa; font-weight: bold; }
+        body { min-height: 100vh; }
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            color: var(--text-white);
+            padding: var(--spacing-md) var(--spacing-lg);
+            box-shadow: var(--shadow-lg);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header h1 {
+            color: var(--text-white);
+            margin-bottom: 0;
+            font-size: 1.8rem;
+        }
+        .nav-links {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+        .nav-links a {
+            color: var(--text-white);
+            text-decoration: none;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-sm);
+            transition: background var(--transition-normal);
+            font-weight: 500;
+        }
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+            color: var(--text-white);
+        }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-xl);
+        }
+        .page-header h2 {
+            color: var(--text-dark);
+            font-size: 1.8rem;
+            margin-bottom: 0;
+        }
+        .search-bar {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--bg-overlay);
+            margin-bottom: var(--spacing-xl);
+            position: relative;
+            overflow: hidden;
+        }
+        .search-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+        }
+        .search-form {
+            display: flex;
+            gap: var(--spacing-lg);
+            align-items: center;
+        }
+        .form-group {
+            flex: 1;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: var(--spacing-xs);
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: var(--spacing-sm);
+            border: 2px solid #e5e7eb;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            transition: all var(--transition-normal);
+            background: rgba(255, 255, 255, 0.9);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(44, 85, 48, 0.1);
+            background: var(--bg-white);
+        }
+        .users-table {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--bg-overlay);
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        .users-table::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+        }
+        .table-header {
+            background: rgba(44, 85, 48, 0.05);
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--bg-overlay);
+        }
+        .table-header h2 {
+            margin: 0;
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+        .table-container {
+            overflow-x: auto;
+            overflow-y: visible;
+            border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+            position: relative;
+        }
+        table {
+            width: 100%;
+            min-width: 1100px;
+            border-collapse: collapse;
+            white-space: nowrap;
+        }
+        th, td {
+            padding: var(--spacing-md);
+            text-align: left;
+            border-bottom: 1px solid var(--bg-overlay);
+            white-space: nowrap;
+        }
+        th {
+            background: rgba(44, 85, 48, 0.05);
+            font-weight: 600;
+            color: var(--text-dark);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
         tr:hover { background: #f8f9fa; }
         .status-badge { padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.8rem; font-weight: bold; }
         .status-active { background: #d4edda; color: #155724; }
         .status-inactive { background: #f8d7da; color: #721c24; }
-        .actions { display: flex; gap: 0.5rem; }
+        .actions { display: flex; gap: var(--spacing-xs); flex-wrap: nowrap; min-width: 200px; }
+        .actions .btn { padding: var(--spacing-xs) var(--spacing-sm); font-size: 0.8rem; white-space: nowrap; min-width: auto; flex-shrink: 0; }
+        .actions .btn i { margin-right: var(--spacing-xs); }
         .error { background: #fee; color: #c33; padding: 1rem; border-radius: 5px; margin-bottom: 1rem; border: 1px solid #fcc; }
         .success { background: #efe; color: #3c3; padding: 1rem; border-radius: 5px; margin-bottom: 1rem; border: 1px solid #cfc; }
-        .form-container { background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 2rem; margin-bottom: 2rem; }
-        .form-header { background: #f8f9fa; padding: 1rem; border-radius: 5px; margin-bottom: 2rem; border-left: 4px solid #667eea; }
-        .form-header h3 { margin: 0; color: #333; font-size: 1.2rem; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
-        .form-group.full-width { grid-column: 1 / -1; }
-        .form-actions { display: flex; gap: 1rem; justify-content: flex-end; padding-top: 1rem; border-top: 1px solid #eee; margin-top: 2rem; }
-        @media (max-width: 900px) { .users-table { overflow-x: auto; } table { min-width: 900px; } }
-        @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } .form-actions { flex-direction: column; } .nav-links { flex-direction: column; gap: 0.5rem; } .search-form { flex-direction: column; align-items: stretch; } }
+        @media (max-width: 768px) {
+            .nav-links { flex-direction: column; gap: 0.5rem; }
+            .search-form { flex-direction: column; align-items: stretch; }
+            .actions { flex-direction: column; min-width: 150px; }
+            .actions .btn { width: 100%; justify-content: center; }
+        }
+        @media (max-width: 1200px) {
+            .table-container { overflow-x: auto; }
+            table { min-width: 900px; }
+            .actions { min-width: 150px; }
+        }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>User Management</h1>
-        <div class="nav-links">
-            <a href="${pageContext.request.contextPath}/admin/dashboard">Dashboard</a>
-            <a href="${pageContext.request.contextPath}/items/">Items</a>
-            <a href="${pageContext.request.contextPath}/customers/">Customers</a>
-            <a href="${pageContext.request.contextPath}/bills/">Bills</a>
-            <a href="${pageContext.request.contextPath}/logout">Logout</a>
+        <div class="header-content">
+            <h1><i class="fas fa-users-cog"></i> User Management</h1>
+            <div class="nav-links">
+                <a href="${pageContext.request.contextPath}/admin/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a href="${pageContext.request.contextPath}/items/"><i class="fas fa-boxes"></i> Items</a>
+                <a href="${pageContext.request.contextPath}/customers/"><i class="fas fa-users"></i> Customers</a>
+                <a href="${pageContext.request.contextPath}/bills/"><i class="fas fa-file-invoice"></i> Bills</a>
+                <a href="${pageContext.request.contextPath}/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
         </div>
     </div>
     <div class="container">
@@ -72,7 +207,7 @@
         <c:if test="${not empty error}"><div class="error">${error}</div></c:if>
         <div class="page-header">
             <h2>User Management</h2>
-            <a href="#" class="btn" id="showCreateUser">Add New User</a>
+            <a href="#" class="btn" id="showCreateUser"><i class="fas fa-user-plus"></i> Add New User</a>
         </div>
         <div class="search-bar">
             <form class="search-form" method="get" action="${pageContext.request.contextPath}/admin/users">
@@ -91,7 +226,7 @@
                 </div>
                 <div class="form-group">
                     <label>&nbsp;</label>
-                    <button type="submit" class="btn">Search</button>
+                    <button type="submit" class="btn"><i class="fas fa-search"></i> Search</button>
                 </div>
             </form>
         </div>
@@ -205,6 +340,7 @@
         </c:if>
         <div class="users-table">
             <div class="table-header"><h2>All Users (${users.size()} users)</h2></div>
+            <div class="table-container">
             <table>
                 <thead>
                     <tr>
@@ -233,12 +369,12 @@
                                     <form method="get" action="${pageContext.request.contextPath}/admin/users" style="display:inline;">
                                         <input type="hidden" name="id" value="${user.id}" />
                                         <input type="hidden" name="action" value="edit" />
-                                        <button type="submit" class="btn btn-warning">Edit</button>
+                                        <button type="submit" class="btn btn-warning"><i class="fas fa-edit"></i> Edit</button>
                                     </form>
                                     <form method="post" action="${pageContext.request.contextPath}/admin/users" style="display:inline;">
                                         <input type="hidden" name="action" value="delete" />
                                         <input type="hidden" name="id" value="${user.id}" />
-                                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this user?');">Delete</button>
+                                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this user?');"><i class="fas fa-trash"></i> Delete</button>
                                     </form>
                                 </div>
                             </td>
@@ -246,6 +382,7 @@
                     </c:forEach>
                 </tbody>
             </table>
+            </div>
             <c:if test="${empty users}">
                 <div style="padding: 2rem; text-align: center; color: #666;">
                     <p>No users found. <a href="#" id="showCreateUserInline">Add your first user</a></p>
@@ -253,6 +390,7 @@
             </c:if>
         </div>
     </div>
+    <script src="https://kit.fontawesome.com/4b7c1b6e8b.js" crossorigin="anonymous"></script>
     <script>
         // Show/hide create user form
         document.addEventListener('DOMContentLoaded', function() {
