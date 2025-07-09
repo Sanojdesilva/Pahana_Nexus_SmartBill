@@ -585,8 +585,11 @@
                 priceDisplay.textContent = '$' + price.toFixed(2);
                 stockDisplay.textContent = stock;
                 
-                // Update quantity max value
+                // Update quantity max value and add stock warning
                 quantityInput.max = stock;
+                
+                // Add stock warning if quantity exceeds stock
+                checkStockWarning(rowIndex);
                 
                 updateItemTotal(rowIndex);
             } else {
@@ -606,7 +609,41 @@
             const total = price * quantity;
             
             totalDisplay.textContent = '$' + total.toFixed(2);
+            
+            // Check stock warning when quantity changes
+            checkStockWarning(rowIndex);
+            
             updateTotals();
+        }
+        
+        function checkStockWarning(rowIndex) {
+            const select = document.querySelector('#item-row-' + rowIndex + ' .item-select');
+            const quantityInput = document.querySelector('#item-row-' + rowIndex + ' .quantity-input');
+            const stockDisplay = document.getElementById('stock-' + rowIndex);
+            
+            // Remove existing warning
+            const existingWarning = document.querySelector('#item-row-' + rowIndex + ' .stock-warning');
+            if (existingWarning) {
+                existingWarning.remove();
+            }
+            
+            if (select.value && quantityInput.value) {
+                const selectedOption = select.options[select.selectedIndex];
+                const stock = parseInt(selectedOption.getAttribute('data-stock'));
+                const quantity = parseInt(quantityInput.value);
+                
+                if (quantity > stock) {
+                    const warning = document.createElement('div');
+                    warning.className = 'stock-warning';
+                    warning.textContent = `Warning: Only ${stock} items available in stock!`;
+                    warning.style.color = '#dc3545';
+                    warning.style.fontSize = '0.8rem';
+                    warning.style.marginTop = '0.25rem';
+                    
+                    const stockDisplayDiv = stockDisplay.parentElement;
+                    stockDisplayDiv.appendChild(warning);
+                }
+            }
         }
         
         function updateTotals() {
@@ -630,6 +667,36 @@
         // Initialize totals on page load
         document.addEventListener('DOMContentLoaded', function() {
             updateTotals();
+        });
+        
+        // Form validation before submission
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const itemRows = document.querySelectorAll('.item-row:not(.header)');
+            let hasStockIssue = false;
+            let stockIssues = [];
+            
+            itemRows.forEach((row, index) => {
+                const select = row.querySelector('.item-select');
+                const quantityInput = row.querySelector('.quantity-input');
+                
+                if (select.value && quantityInput.value) {
+                    const selectedOption = select.options[select.selectedIndex];
+                    const stock = parseInt(selectedOption.getAttribute('data-stock'));
+                    const quantity = parseInt(quantityInput.value);
+                    const itemName = selectedOption.textContent.split(' - ')[1].split(' (Stock:')[0];
+                    
+                    if (quantity > stock) {
+                        hasStockIssue = true;
+                        stockIssues.push(`${itemName}: Requested ${quantity}, Available ${stock}`);
+                    }
+                }
+            });
+            
+            if (hasStockIssue) {
+                e.preventDefault();
+                alert('Stock Insufficient!\n\n' + stockIssues.join('\n') + '\n\nPlease adjust quantities or select different items.');
+                return false;
+            }
         });
     </script>
 </body>

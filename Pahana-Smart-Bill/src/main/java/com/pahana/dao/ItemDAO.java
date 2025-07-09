@@ -221,6 +221,23 @@ public class ItemDAO {
         }
     }
     
+    public boolean increaseStock(int itemId, int quantity) {
+        String sql = "UPDATE items SET stock_quantity = stock_quantity + ?, updated_at = ? WHERE id = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, quantity);
+            pstmt.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+            pstmt.setInt(3, itemId);
+            
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error increasing stock: " + e.getMessage());
+            return false;
+        }
+    }
+    
     public List<Item> getLowStockItems() {
         List<Item> items = new ArrayList<>();
         String sql = "SELECT * FROM items WHERE stock_quantity <= reorder_level AND is_active = true ORDER BY stock_quantity";
@@ -257,6 +274,8 @@ public class ItemDAO {
         }
         return items;
     }
+    
+
     
     private Item mapResultSetToItem(ResultSet rs) throws SQLException {
         Item item = new Item();

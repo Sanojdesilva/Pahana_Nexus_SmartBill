@@ -32,20 +32,23 @@ public class InventoryService {
      */
     public boolean createBillWithItems(Bill bill, List<BillItem> billItems) {
         try {
-            // Generate bill number
-            bill.setBillNumber(generateBillNumber());
+            // Use the bill number that was already set in the servlet
+            // bill.setBillNumber(generateBillNumber()); // Removed - bill number is already set
             
-            // Calculate bill totals
+            // Calculate bill totals (if not already calculated)
             double subtotal = 0;
             for (BillItem item : billItems) {
                 item.calculateTotalPrice();
                 subtotal += item.getTotalPrice();
             }
             
-            bill.setSubtotal(subtotal);
-            bill.setTaxAmount(subtotal * 0.15); // 15% tax
-            bill.setTotal(subtotal + bill.getTaxAmount());
-            bill.setTaxRate(15.0);
+            // Only set totals if not already set
+            if (bill.getSubtotal() == 0) {
+                bill.setSubtotal(subtotal);
+                bill.setTaxAmount(subtotal * 0.15); // 15% tax
+                bill.setTotal(subtotal + bill.getTaxAmount());
+                bill.setTaxRate(15.0);
+            }
             
             // Create the bill
             if (!billDAO.createBill(bill)) {
@@ -88,7 +91,7 @@ public class InventoryService {
     }
     
     /**
-     * Update item stock when sold
+     * Update item stock when sold (reduce stock)
      */
     public boolean updateItemStock(int itemId, int quantity) {
         try {
@@ -106,6 +109,24 @@ public class InventoryService {
             return itemDAO.reduceStock(itemId, quantity);
         } catch (Exception e) {
             System.err.println("Error updating item stock: " + e.getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Restore item stock when bill is cancelled (increase stock)
+     */
+    public boolean restoreItemStock(int itemId, int quantity) {
+        try {
+            Item item = itemDAO.getItemById(itemId);
+            if (item == null) {
+                return false;
+            }
+            
+            // Increase stock
+            return itemDAO.increaseStock(itemId, quantity);
+        } catch (Exception e) {
+            System.err.println("Error restoring item stock: " + e.getMessage());
             return false;
         }
     }
@@ -182,10 +203,9 @@ public class InventoryService {
             
             // Restore inventory for each item
             for (BillItem billItem : billItems) {
-                Item item = itemDAO.getItemById(billItem.getItemId());
-                if (item != null) {
-                    item.updateStock(billItem.getQuantity()); // Add back to stock
-                    itemDAO.updateItem(item);
+                if (!restoreItemStock(billItem.getItemId(), billItem.getQuantity())) {
+                    System.err.println("Failed to restore stock for item ID: " + billItem.getItemId());
+                    return false;
                 }
             }
             

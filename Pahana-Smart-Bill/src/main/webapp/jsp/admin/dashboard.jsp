@@ -281,6 +281,11 @@
                 <h3>System Settings</h3>
                 <p>Configure system parameters</p>
             </a>
+            
+            <a href="${pageContext.request.contextPath}/admin/stock-test" class="nav-card">
+                <h3>Stock Management Test</h3>
+                <p>Test stock management functionality</p>
+            </a>
         </div>
     </div>
 </body>

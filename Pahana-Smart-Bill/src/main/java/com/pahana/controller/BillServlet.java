@@ -5,9 +5,11 @@ import com.pahana.model.User;
 import com.pahana.dao.BillDAO;
 import com.pahana.dao.CustomerDAO;
 import com.pahana.dao.ItemDAO;
+import com.pahana.service.InventoryService;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.ArrayList;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -16,18 +18,21 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.Objects;
 import com.pahana.dao.BillItemDAO;
+import com.pahana.model.BillItem;
 
 public class BillServlet extends HttpServlet {
     
     private BillDAO billDAO;
     private CustomerDAO customerDAO;
     private ItemDAO itemDAO;
+    private InventoryService inventoryService;
     
     @Override
     public void init() throws ServletException {
         billDAO = new BillDAO();
         customerDAO = new CustomerDAO();
         itemDAO = new ItemDAO();
+        inventoryService = new InventoryService();
     }
     
     @Override
@@ -205,23 +210,48 @@ public class BillServlet extends HttpServlet {
                 return;
             }
 
-            int unitsConsumed = 0;
-            for (String qtyStr : quantities) {
-                Integer qty = parseIntOrNull(qtyStr);
-                if (qty == null || qty <= 0) {
-                    request.setAttribute("error", "All item quantities must be positive numbers.");
-                    showCreateForm(request, response);
-                    return;
+            // Validate stock availability before creating bill
+            List<BillItem> billItems = new ArrayList<>();
+            for (int i = 0; i < itemIds.length; i++) {
+                if (itemIds[i] != null && !itemIds[i].trim().isEmpty()) {
+                    Integer itemId = Integer.parseInt(itemIds[i]);
+                    Integer qty = parseIntOrNull(quantities[i]);
+                    
+                    if (qty == null || qty <= 0) {
+                        request.setAttribute("error", "All item quantities must be positive numbers.");
+                        showCreateForm(request, response);
+                        return;
+                    }
+                    
+                    // Check if sufficient stock is available
+                    if (!inventoryService.hasSufficientStock(itemId, qty)) {
+                        com.pahana.model.Item item = itemDAO.getItemById(itemId);
+                        String itemName = item != null ? item.getName() : "Unknown";
+                        request.setAttribute("error", "Insufficient stock for item: " + itemName + ". Available: " + 
+                            (item != null ? item.getStockQuantity() : 0) + ", Requested: " + qty);
+                        showCreateForm(request, response);
+                        return;
+                    }
+                    
+                    // Create bill item for later processing
+                    BillItem billItem = new BillItem();
+                    billItem.setItemId(itemId);
+                    billItem.setQuantity(qty);
+                    com.pahana.model.Item item = itemDAO.getItemById(itemId);
+                    if (item != null) {
+                        billItem.setUnitPrice(item.getPrice());
+                        billItem.calculateTotalPrice();
+                    }
+                    billItems.add(billItem);
                 }
-                unitsConsumed += qty;
             }
 
             // Create bill
             Bill bill = new Bill();
             bill.setCustomerId(request.getParameter("customerId"));
             bill.setStatus(request.getParameter("status"));
-            bill.setUnitsConsumed(unitsConsumed); // auto-calculated
-            bill.setUnitRate(0.0); // Not used in this context, or you can calculate average price/unit if needed
+            bill.setUnitsConsumed(billItems.stream().mapToInt(BillItem::getQuantity).sum());
+            bill.setUnitRate(0.0);
             bill.setDueDate(parseDateOrNull(request.getParameter("dueDate")));
             bill.setPaidDate(parseDateOrNull(request.getParameter("paidDate")));
             bill.setNotes(request.getParameter("notes"));
@@ -230,16 +260,7 @@ public class BillServlet extends HttpServlet {
             bill.setBillNumber(generateBillNumber());
 
             // Calculate totals
-            double subtotal = 0.0;
-            for (int i = 0; i < itemIds.length; i++) {
-                if (itemIds[i] != null && !itemIds[i].trim().isEmpty()) {
-                    com.pahana.model.Item item = itemDAO.getItemById(Integer.parseInt(itemIds[i]));
-                    Integer qty = parseIntOrNull(quantities[i]);
-                    if (item != null && qty != null && qty > 0) {
-                        subtotal += item.getPrice() * qty;
-                    }
-                }
-            }
+            double subtotal = billItems.stream().mapToDouble(BillItem::getTotalPrice).sum();
             double taxAmount = subtotal * 0.15; // 15% tax
             double total = subtotal + taxAmount;
 
@@ -247,31 +268,12 @@ public class BillServlet extends HttpServlet {
             bill.setTaxAmount(taxAmount);
             bill.setTotal(total);
 
-            // Save bill
-            if (billDAO.createBill(bill)) {
-                // Save bill items
-                BillItemDAO billItemDAO = new BillItemDAO();
-                for (int i = 0; i < itemIds.length; i++) {
-                    if (itemIds[i] != null && !itemIds[i].trim().isEmpty()) {
-                        com.pahana.model.BillItem billItem = new com.pahana.model.BillItem();
-                        billItem.setBillId(bill.getId());
-                        billItem.setItemId(Integer.parseInt(itemIds[i]));
-                        Integer qty = parseIntOrNull(quantities[i]);
-                        if (qty != null && qty > 0) {
-                            billItem.setQuantity(qty);
-                            com.pahana.model.Item item = itemDAO.getItemById(billItem.getItemId());
-                            if (item != null) {
-                                billItem.setUnitPrice(item.getPrice());
-                                billItem.calculateTotalPrice();
-                                billItemDAO.createBillItem(billItem);
-                            }
-                        }
-                    }
-                }
-                request.setAttribute("message", "Bill created successfully");
+            // Use InventoryService to create bill with proper stock management
+            if (inventoryService.createBillWithItems(bill, billItems)) {
+                request.setAttribute("message", "Bill created successfully with stock updated");
                 response.sendRedirect(request.getContextPath() + "/bills/");
             } else {
-                request.setAttribute("error", "Failed to create bill");
+                request.setAttribute("error", "Failed to create bill. Please check stock availability.");
                 showCreateForm(request, response);
             }
         } catch (Exception e) {
@@ -336,13 +338,20 @@ public class BillServlet extends HttpServlet {
             if (billIdStr != null) {
                 int billId = Integer.parseInt(billIdStr);
                 
+                // Get bill to check if it was already cancelled
+                Bill bill = billDAO.getBillById(billId);
+                if (bill != null && !"CANCELLED".equals(bill.getStatus())) {
+                    // Restore stock before deleting (only if not already cancelled)
+                    inventoryService.cancelBill(billId);
+                }
+                
                 // Delete bill items first
                 BillItemDAO billItemDAO = new BillItemDAO();
                 billItemDAO.deleteAllBillItems(billId);
                 
                 // Delete bill
                 if (billDAO.deleteBill(billId)) {
-                    request.setAttribute("message", "Bill deleted successfully");
+                    request.setAttribute("message", "Bill deleted successfully and stock restored");
                 } else {
                     request.setAttribute("error", "Failed to delete bill");
                 }
@@ -363,10 +372,30 @@ public class BillServlet extends HttpServlet {
             if (billIdStr != null && status != null) {
                 int billId = Integer.parseInt(billIdStr);
                 
-                if (billDAO.updateBillStatus(billId, status)) {
-                    request.setAttribute("message", "Bill status updated successfully");
+                // Get current bill status before updating
+                Bill currentBill = billDAO.getBillById(billId);
+                if (currentBill == null) {
+                    request.setAttribute("error", "Bill not found");
+                    response.sendRedirect(request.getContextPath() + "/bills/");
+                    return;
+                }
+                
+                String previousStatus = currentBill.getStatus();
+                
+                // If status is being changed to CANCELLED, restore stock
+                if ("CANCELLED".equals(status) && !"CANCELLED".equals(previousStatus)) {
+                    if (inventoryService.cancelBill(billId)) {
+                        request.setAttribute("message", "Bill cancelled successfully and stock restored");
+                    } else {
+                        request.setAttribute("error", "Failed to cancel bill and restore stock");
+                    }
                 } else {
-                    request.setAttribute("error", "Failed to update bill status");
+                    // Regular status update
+                    if (billDAO.updateBillStatus(billId, status)) {
+                        request.setAttribute("message", "Bill status updated successfully");
+                    } else {
+                        request.setAttribute("error", "Failed to update bill status");
+                    }
                 }
             }
         } catch (Exception e) {
