@@ -294,6 +294,7 @@
             }
         }
     </style>
+    <script src="${pageContext.request.contextPath}/js/theme-manager.js"></script>
 </head>
 <body>
     <div class="floating-elements">

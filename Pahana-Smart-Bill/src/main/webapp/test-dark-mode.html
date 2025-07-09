@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Mode Test - Pahana Smart Bill</title>
+    <link rel="stylesheet" href="css/global-theme.css">
+    <script src="js/theme-manager.js"></script>
+    <style>
+        body {
+            min-height: 100vh;
+            padding: var(--spacing-lg);
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            padding: var(--spacing-2xl);
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--bg-overlay);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .test-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+        }
+        
+        .test-header {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .test-header h1 {
+            color: var(--text-dark);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .test-header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+        
+        .test-section {
+            margin-bottom: var(--spacing-xl);
+            padding: var(--spacing-lg);
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--bg-overlay);
+        }
+        
+        .test-section h2 {
+            color: var(--text-dark);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .test-section p {
+            color: var(--text-light);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .demo-elements {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+        }
+        
+        .demo-card {
+            background: var(--bg-white);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--bg-overlay);
+            text-align: center;
+        }
+        
+        .demo-card h3 {
+            color: var(--text-dark);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .demo-card p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+        
+        .demo-button {
+            background: var(--primary-color);
+            color: var(--text-white);
+            border: none;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            margin: var(--spacing-xs);
+        }
+        
+        .demo-button:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+        
+        .demo-input {
+            width: 100%;
+            padding: var(--spacing-sm);
+            border: 2px solid var(--bg-overlay);
+            border-radius: var(--radius-sm);
+            background: var(--bg-white);
+            color: var(--text-dark);
+            margin: var(--spacing-xs) 0;
+        }
+        
+        .demo-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(44, 85, 48, 0.1);
+        }
+        
+        .theme-toggle-demo {
+            position: fixed;
+            top: var(--spacing-lg);
+            right: var(--spacing-lg);
+            z-index: 1000;
+        }
+        
+        .info-box {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: var(--text-white);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .info-box h3 {
+            color: var(--text-white);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .info-box ul {
+            margin: 0;
+            padding-left: var(--spacing-lg);
+        }
+        
+        .info-box li {
+            margin-bottom: var(--spacing-xs);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>🌙 Dark Mode Toggle Test</h1>
+            <p>Test the dark mode functionality across all pages</p>
+        </div>
+        
+        <div class="info-box">
+            <h3>✨ Dark Mode Features</h3>
+            <ul>
+                <li><strong>Automatic Toggle:</strong> The toggle button appears automatically on all pages</li>
+                <li><strong>Persistent Settings:</strong> Your theme preference is saved in localStorage</li>
+                <li><strong>System Preference:</strong> Respects your system's dark/light mode preference</li>
+                <li><strong>Smooth Transitions:</strong> All color changes are animated for a better experience</li>
+                <li><strong>Universal:</strong> Works across all pages in the application</li>
+            </ul>
+        </div>
+        
+        <div class="test-section">
+            <h2>🎨 Theme Elements</h2>
+            <p>These elements demonstrate how different components look in both light and dark modes:</p>
+            
+            <div class="demo-elements">
+                <div class="demo-card">
+                    <h3>Cards</h3>
+                    <p>Background and borders adapt to theme</p>
+                </div>
+                
+                <div class="demo-card">
+                    <h3>Text</h3>
+                    <p>Text colors automatically adjust</p>
+                </div>
+                
+                <div class="demo-card">
+                    <h3>Buttons</h3>
+                    <button class="demo-button">Primary Button</button>
+                    <button class="demo-button" style="background: var(--secondary-color);">Secondary</button>
+                </div>
+                
+                <div class="demo-card">
+                    <h3>Form Inputs</h3>
+                    <input type="text" class="demo-input" placeholder="Type something here...">
+                    <input type="email" class="demo-input" placeholder="email@example.com">
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔧 How It Works</h2>
+            <p>The dark mode implementation uses CSS custom properties (variables) to define colors for both light and dark themes. When the toggle is clicked:</p>
+            <ol style="color: var(--text-light); padding-left: var(--spacing-lg);">
+                <li>The JavaScript adds/removes the <code>data-theme="dark"</code> attribute from the body</li>
+                <li>CSS variables automatically switch to dark theme values</li>
+                <li>All elements using these variables instantly update their appearance</li>
+                <li>The preference is saved to localStorage for persistence</li>
+            </ol>
+        </div>
+        
+        <div class="test-section">
+            <h2>📱 Responsive Design</h2>
+            <p>The toggle button adapts to different page layouts:</p>
+            <ul style="color: var(--text-light);">
+                <li><strong>Header Pages:</strong> Toggle appears in the header next to user info</li>
+                <li><strong>Login/Register:</strong> Toggle appears as a fixed button in the top-right</li>
+                <li><strong>Other Pages:</strong> Fallback positioning in the top-right corner</li>
+            </ul>
+        </div>
+        
+        <div class="test-section">
+            <h2>🎯 Test Instructions</h2>
+            <p>To test the dark mode functionality:</p>
+            <ol style="color: var(--text-light);">
+                <li>Click the toggle button in the top-right corner</li>
+                <li>Notice how all colors smoothly transition</li>
+                <li>Refresh the page - your preference should persist</li>
+                <li>Navigate to other pages - the toggle should appear everywhere</li>
+                <li>Try different pages like login, dashboard, items, bills, etc.</li>
+            </ol>
+        </div>
+        
+        <div style="text-align: center; margin-top: var(--spacing-xl);">
+            <a href="jsp/login.jsp" class="demo-button" style="text-decoration: none; display: inline-block;">
+                🚀 Go to Login Page
+            </a>
+            <a href="jsp/admin/dashboard.jsp" class="demo-button" style="text-decoration: none; display: inline-block; background: var(--secondary-color);">
+                📊 Go to Dashboard
+            </a>
+        </div>
+    </div>
+</body>
+</html> 
