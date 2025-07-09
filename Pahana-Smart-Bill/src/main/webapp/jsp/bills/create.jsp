@@ -525,6 +525,23 @@
     <script>
         let itemRowCount = 1;
 
+        function updateItemSelectOptions() {
+            // Get all selected values
+            const selects = document.querySelectorAll('.item-select');
+            const selectedValues = Array.from(selects).map(sel => sel.value).filter(val => val);
+
+            selects.forEach(select => {
+                Array.from(select.options).forEach(option => {
+                    if (option.value === "") {
+                        option.disabled = false;
+                    } else {
+                        // Disable if selected in another select (but not in this one)
+                        option.disabled = selectedValues.includes(option.value) && select.value !== option.value;
+                    }
+                });
+            });
+        }
+
         function addItemRow() {
             const container = document.getElementById('itemsContainer');
             const firstRow = document.getElementById('item-row-0');
@@ -567,16 +584,18 @@
 
             // Add event listeners to the new elements
             newSelect.addEventListener('change', function() {
-                // Use the row's data attribute to get the correct index
                 const rowIndex = parseInt(newRow.getAttribute('data-row-index'));
                 updateItemPrice(rowIndex);
+                updateItemSelectOptions();
             });
             newQuantityInput.addEventListener('change', function() {
                 const rowIndex = parseInt(newRow.getAttribute('data-row-index'));
                 updateItemTotal(rowIndex);
             });
             removeBtn.onclick = function() {
-                removeItemRow(itemRowCount);
+                const rowIndex = parseInt(newRow.getAttribute('data-row-index'));
+                removeItemRow(rowIndex);
+                updateItemSelectOptions();
             };
             removeBtn.style.display = 'inline-block';
 
@@ -585,6 +604,7 @@
             // No need to call updateItemPrice here, as the row is empty until user selects an item
 
             itemRowCount++;
+            updateItemSelectOptions();
         }
         
         function removeItemRow(rowIndex) {
@@ -724,6 +744,7 @@
             if (firstSelect) {
                 firstSelect.addEventListener('change', function() {
                     updateItemPrice(0);
+                    updateItemSelectOptions();
                 });
             }
             if (firstQuantityInput) {
@@ -732,6 +753,7 @@
                 });
             }
             updateTotals();
+            updateItemSelectOptions();
         });
         
         // Form validation before submission

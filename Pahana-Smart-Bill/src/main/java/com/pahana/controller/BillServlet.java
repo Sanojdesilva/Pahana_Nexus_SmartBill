@@ -212,27 +212,35 @@ public class BillServlet extends HttpServlet {
 
             // Validate stock availability before creating bill
             List<BillItem> billItems = new ArrayList<>();
+            java.util.Set<Integer> uniqueItemIds = new java.util.HashSet<>();
             for (int i = 0; i < itemIds.length; i++) {
                 if (itemIds[i] != null && !itemIds[i].trim().isEmpty()) {
                     Integer itemId = Integer.parseInt(itemIds[i]);
                     Integer qty = parseIntOrNull(quantities[i]);
-                    
+
+                    // Check for duplicate item IDs
+                    if (!uniqueItemIds.add(itemId)) {
+                        request.setAttribute("error", "Duplicate items are not allowed in a single bill. Please remove duplicate items.");
+                        showCreateForm(request, response);
+                        return;
+                    }
+
                     if (qty == null || qty <= 0) {
                         request.setAttribute("error", "All item quantities must be positive numbers.");
                         showCreateForm(request, response);
                         return;
                     }
-                    
+
                     // Check if sufficient stock is available
                     if (!inventoryService.hasSufficientStock(itemId, qty)) {
                         com.pahana.model.Item item = itemDAO.getItemById(itemId);
                         String itemName = item != null ? item.getName() : "Unknown";
-                        request.setAttribute("error", "Insufficient stock for item: " + itemName + ". Available: " + 
+                        request.setAttribute("error", "Insufficient stock for item: " + itemName + ". Available: " +
                             (item != null ? item.getStockQuantity() : 0) + ", Requested: " + qty);
                         showCreateForm(request, response);
                         return;
                     }
-                    
+
                     // Create bill item for later processing
                     BillItem billItem = new BillItem();
                     billItem.setItemId(itemId);
