@@ -241,10 +241,25 @@
                 <div class="form-group">
                     <label for="category">Category</label>
                     <select id="category" name="category">
-                        <option value="">All Categories</option>
-                        <option value="ELECTRICITY" ${param.category == 'ELECTRICITY' ? 'selected' : ''}>Electricity</option>
-                        <option value="WATER" ${param.category == 'WATER' ? 'selected' : ''}>Water</option>
-                        <option value="GAS" ${param.category == 'GAS' ? 'selected' : ''}>Gas</option>
+                        <option value="" ${param.category == '' ? 'selected' : ''}>All Categories</option>
+                        <option value="FICTION" ${param.category == 'FICTION' ? 'selected' : ''}>Fiction</option>
+                        <option value="NONFICTION" ${param.category == 'NONFICTION' ? 'selected' : ''}>Non-Fiction</option>
+                        <option value="CHILDREN" ${param.category == 'CHILDREN' ? 'selected' : ''}>Children’s Books</option>
+                        <option value="EDUCATIONAL" ${param.category == 'EDUCATIONAL' ? 'selected' : ''}>Educational</option>
+                        <option value="STATIONERY" ${param.category == 'STATIONERY' ? 'selected' : ''}>Stationery</option>
+                        <option value="MAGAZINES" ${param.category == 'MAGAZINES' ? 'selected' : ''}>Magazines</option>
+                        <option value="COMICS" ${param.category == 'COMICS' ? 'selected' : ''}>Comics & Graphic Novels</option>
+                        <option value="REFERENCE" ${param.category == 'REFERENCE' ? 'selected' : ''}>Reference</option>
+                        <option value="ART" ${param.category == 'ART' ? 'selected' : ''}>Art & Photography</option>
+                        <option value="SCIENCE" ${param.category == 'SCIENCE' ? 'selected' : ''}>Science & Technology</option>
+                        <option value="RELIGION" ${param.category == 'RELIGION' ? 'selected' : ''}>Religion & Spirituality</option>
+                        <option value="BIOGRAPHY" ${param.category == 'BIOGRAPHY' ? 'selected' : ''}>Biographies</option>
+                        <option value="HISTORY" ${param.category == 'HISTORY' ? 'selected' : ''}>History</option>
+                        <option value="MYSTERY" ${param.category == 'MYSTERY' ? 'selected' : ''}>Mystery & Thriller</option>
+                        <option value="ROMANCE" ${param.category == 'ROMANCE' ? 'selected' : ''}>Romance</option>
+                        <option value="FANTASY" ${param.category == 'FANTASY' ? 'selected' : ''}>Fantasy & Sci-Fi</option>
+                        <option value="SELFHELP" ${param.category == 'SELFHELP' ? 'selected' : ''}>Self-Help</option>
+                        <option value="BUSINESS" ${param.category == 'BUSINESS' ? 'selected' : ''}>Business & Economics</option>
                         <option value="OTHER" ${param.category == 'OTHER' ? 'selected' : ''}>Other</option>
                     </select>
                 </div>

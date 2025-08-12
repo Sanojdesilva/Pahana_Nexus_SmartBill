@@ -472,7 +472,7 @@
                         <!-- Initial item row -->
                         <div class="item-row" id="item-row-0">
                             <div>
-                                <select class="item-select" name="itemIds[]" onchange="updateItemPrice(0)" required>
+                                <select class="item-select" name="itemIds[]" required>
                                     <option value="">Select Item</option>
                                     <c:forEach var="item" items="${items}">
                                         <option value="${item.id}" data-price="${item.price}" data-stock="${item.stockQuantity}" data-category="${item.category}">
@@ -482,7 +482,7 @@
                                 </select>
                             </div>
                             <div>
-                                <input type="number" class="quantity-input" name="quantities[]" min="1" value="1" onchange="updateItemTotal(0)" required />
+                                <input type="number" class="quantity-input" name="quantities[]" min="1" value="1" required />
                             </div>
                             <div>
                                 <div class="price-display" id="price-0">$0.00</div>
@@ -494,7 +494,7 @@
                                 <div class="stock-display" id="stock-0">0</div>
                             </div>
                             <div>
-                                <button type="button" class="remove-item-btn" onclick="removeItemRow(0)" style="display: none;">Remove</button>
+                                <button type="button" class="remove-item-btn">Remove</button>
                             </div>
                         </div>
                     </div>
@@ -524,43 +524,87 @@
     </div>
     <script>
         let itemRowCount = 1;
-        
+
+        function updateItemSelectOptions() {
+            // Get all selected values
+            const selects = document.querySelectorAll('.item-select');
+            const selectedValues = Array.from(selects).map(sel => sel.value).filter(val => val);
+
+            selects.forEach(select => {
+                Array.from(select.options).forEach(option => {
+                    if (option.value === "") {
+                        option.disabled = false;
+                    } else {
+                        // Disable if selected in another select (but not in this one)
+                        option.disabled = selectedValues.includes(option.value) && select.value !== option.value;
+                    }
+                });
+            });
+        }
+
         function addItemRow() {
             const container = document.getElementById('itemsContainer');
-            const newRow = document.createElement('div');
-            newRow.className = 'item-row';
+            const firstRow = document.getElementById('item-row-0');
+            const newRow = firstRow.cloneNode(true);
+
+            // Update the row ID and data attribute
             newRow.id = 'item-row-' + itemRowCount;
-            
-            newRow.innerHTML = `
-                <div>
-                    <select class="item-select" name="itemIds[]" onchange="updateItemPrice(${itemRowCount})" required>
-                        <option value="">Select Item</option>
-                        <c:forEach var="item" items="${items}">
-                            <option value="${item.id}" data-price="${item.price}" data-stock="${item.stockQuantity}" data-category="${item.category}">
-                                ${item.code} - ${item.name} (Stock: ${item.stockQuantity})
-                            </option>
-                        </c:forEach>
-                    </select>
-                </div>
-                <div>
-                    <input type="number" class="quantity-input" name="quantities[]" min="1" value="1" onchange="updateItemTotal(${itemRowCount})" required />
-                </div>
-                <div>
-                    <div class="price-display" id="price-${itemRowCount}">$0.00</div>
-                </div>
-                <div>
-                    <div class="total-display" id="total-${itemRowCount}">$0.00</div>
-                </div>
-                <div>
-                    <div class="stock-display" id="stock-${itemRowCount}">0</div>
-                </div>
-                <div>
-                    <button type="button" class="remove-item-btn" onclick="removeItemRow(${itemRowCount})">Remove</button>
-                </div>
-            `;
-            
+            newRow.setAttribute('data-row-index', itemRowCount);
+
+            // Update all IDs inside the row
+            newRow.querySelectorAll('[id]').forEach(function(el) {
+                el.id = el.id.replace('-0', '-' + itemRowCount);
+            });
+
+            // Reset values for the new row
+            const select = newRow.querySelector('.item-select');
+            const quantityInput = newRow.querySelector('.quantity-input');
+            const priceDisplay = newRow.querySelector('.price-display');
+            const totalDisplay = newRow.querySelector('.total-display');
+            const stockDisplay = newRow.querySelector('.stock-display');
+            const removeBtn = newRow.querySelector('.remove-item-btn');
+
+            // Reset select and input values
+            select.selectedIndex = 0;
+            quantityInput.value = 1;
+            priceDisplay.textContent = '$0.00';
+            totalDisplay.textContent = '$0.00';
+            stockDisplay.textContent = '0';
+
+            // Remove any stock warning
+            const warning = newRow.querySelector('.stock-warning');
+            if (warning) warning.remove();
+
+            // Remove all event listeners by replacing the elements
+            const newSelect = select.cloneNode(true);
+            select.parentNode.replaceChild(newSelect, select);
+
+            const newQuantityInput = quantityInput.cloneNode(true);
+            quantityInput.parentNode.replaceChild(newQuantityInput, quantityInput);
+
+            // Add event listeners to the new elements
+            newSelect.addEventListener('change', function() {
+                const rowIndex = parseInt(newRow.getAttribute('data-row-index'));
+                updateItemPrice(rowIndex);
+                updateItemSelectOptions();
+            });
+            newQuantityInput.addEventListener('change', function() {
+                const rowIndex = parseInt(newRow.getAttribute('data-row-index'));
+                updateItemTotal(rowIndex);
+            });
+            removeBtn.onclick = function() {
+                const rowIndex = parseInt(newRow.getAttribute('data-row-index'));
+                removeItemRow(rowIndex);
+                updateItemSelectOptions();
+            };
+            removeBtn.style.display = 'inline-block';
+
             container.appendChild(newRow);
+
+            // No need to call updateItemPrice here, as the row is empty until user selects an item
+
             itemRowCount++;
+            updateItemSelectOptions();
         }
         
         function removeItemRow(rowIndex) {
@@ -576,6 +620,12 @@
             const priceDisplay = document.getElementById('price-' + rowIndex);
             const stockDisplay = document.getElementById('stock-' + rowIndex);
             const quantityInput = document.querySelector('#item-row-' + rowIndex + ' .quantity-input');
+            
+            // Check if all elements exist
+            if (!select || !priceDisplay || !stockDisplay || !quantityInput) {
+                console.warn('Some elements not found for row index:', rowIndex);
+                return;
+            }
             
             if (select.value) {
                 const selectedOption = select.options[select.selectedIndex];
@@ -604,6 +654,12 @@
             const totalDisplay = document.getElementById('total-' + rowIndex);
             const quantityInput = document.querySelector('#item-row-' + rowIndex + ' .quantity-input');
             
+            // Check if all elements exist
+            if (!priceDisplay || !totalDisplay || !quantityInput) {
+                console.warn('Some elements not found for row index:', rowIndex);
+                return;
+            }
+            
             const price = parseFloat(priceDisplay.textContent.replace('$', ''));
             const quantity = parseInt(quantityInput.value) || 0;
             const total = price * quantity;
@@ -620,6 +676,12 @@
             const select = document.querySelector('#item-row-' + rowIndex + ' .item-select');
             const quantityInput = document.querySelector('#item-row-' + rowIndex + ' .quantity-input');
             const stockDisplay = document.getElementById('stock-' + rowIndex);
+            
+            // Check if all elements exist
+            if (!select || !quantityInput || !stockDisplay) {
+                console.warn('Some elements not found for row index:', rowIndex);
+                return;
+            }
             
             // Remove existing warning
             const existingWarning = document.querySelector('#item-row-' + rowIndex + ' .stock-warning');
@@ -659,14 +721,39 @@
             const tax = subtotal * 0.15; // 15% tax
             const total = subtotal + tax;
             
-            document.getElementById('displaySubtotal').textContent = '$' + subtotal.toFixed(2);
-            document.getElementById('displayTax').textContent = '$' + tax.toFixed(2);
-            document.getElementById('displayTotal').textContent = '$' + total.toFixed(2);
+            const displaySubtotal = document.getElementById('displaySubtotal');
+            const displayTax = document.getElementById('displayTax');
+            const displayTotal = document.getElementById('displayTotal');
+            
+            if (displaySubtotal) displaySubtotal.textContent = '$' + subtotal.toFixed(2);
+            if (displayTax) displayTax.textContent = '$' + tax.toFixed(2);
+            if (displayTotal) displayTotal.textContent = '$' + total.toFixed(2);
         }
         
-        // Initialize totals on page load
+        // On page load, set up the first row
+
         document.addEventListener('DOMContentLoaded', function() {
+            const firstRemoveBtn = document.querySelector('#item-row-0 .remove-item-btn');
+            if (firstRemoveBtn) {
+                firstRemoveBtn.style.display = 'none';
+            }
+            const firstSelect = document.querySelector('#item-row-0 .item-select');
+            const firstQuantityInput = document.querySelector('#item-row-0 .quantity-input');
+            
+            // Check if elements exist before adding event listeners
+            if (firstSelect) {
+                firstSelect.addEventListener('change', function() {
+                    updateItemPrice(0);
+                    updateItemSelectOptions();
+                });
+            }
+            if (firstQuantityInput) {
+                firstQuantityInput.addEventListener('change', function() {
+                    updateItemTotal(0);
+                });
+            }
             updateTotals();
+            updateItemSelectOptions();
         });
         
         // Form validation before submission
